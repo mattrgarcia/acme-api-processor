@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js'></script>
+  </head>
+  <body>
+    <script>
+      const loadData = async()=> {
+        const urls = [
+          'https://acme-users-api-rev.herokuapp.com/api/companies',
+          'https://acme-users-api-rev.herokuapp.com/api/products',
+          'https://acme-users-api-rev.herokuapp.com/api/offerings'
+        ];
+        const responses = await Promise.all(urls.map(url => axios.get(url)));
+        const [companies, products, offerings] = responses.map(response => response.data);
+
+        const findProductsInPriceRange = (products, {min, max})=>{
+        return products.filter(product=> product.suggestedPrice > min && product.suggestedPrice <= max);
+      };
+      const productsInPriceRange = findProductsInPriceRange(products, {min: 1, max: 15});
+      // console.log(productsInPriceRange);
+
+      const groupCompaniesByLetter = (companies)=> {
+        return companies.reduce((acc, obj)=> {
+          let letter = obj.name.charAt(0);
+          if (!acc[letter]){
+            acc[letter] = [];
+          };
+            acc[letter].push(obj);
+          return acc;
+        }, {})
+      };
+      const groupedCompaniesByLetter = groupCompaniesByLetter(companies);
+      // console.log(groupedCompaniesByLetter);
+
+      const groupCompaniesByState = (companies)=>{
+        return companies.reduce((acc, obj)=>{
+          let state = obj.state;
+          if (!acc[state]){
+            acc[state] = [];
+          }
+          acc[state].push(obj);
+          return acc;
+        }, {});
+      };
+
+      const groupedCompaniesByState =  groupCompaniesByState(companies);
+      // console.log(groupedCompaniesByState);
+
+      const processOfferings = (companies, products, offerings)=> {
+
+      };
+
+      const processedOfferings = processOfferings({companies, products, offerings});
+      // console.log(processedOfferings);
+
+      const companiesByNumberOfOfferings = (companies, offerings, num)=> {
+        return companies.filter(company=> offerings.find(offering=> offering.companyId === company.id).length > num);
+      };
+
+      const threeOrMoreOfferings = companiesByNumberOfOfferings(companies, offerings, 3);
+      console.log(threeOrMoreOfferings);
+
+      };
+      loadData();
+
+
+
+    </script>
+  </body>
+</html>
